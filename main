@@ -1,34 +1,52 @@
 import socket
 import sys
+import threading
+from colorama import Fore, Style, init
+import pyfiglet
+
+# Init colorama
+init(autoreset=True)
+
+# Banner
+def banner():
+    ascii_banner = pyfiglet.figlet_format("AMIN")
+    colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.CYAN, Fore.MAGENTA]
+    for i, line in enumerate(ascii_banner.split("\n")):
+        print(colors[i % len(colors)] + line)
+
+# Threaded scanner
+def scan_port(target, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socket.setdefaulttimeout(0.5)
+        result = sock.connect_ex((target, port))
+        if result == 0:
+            print(Fore.GREEN + f"[+] Port {port} is OPEN")
+        sock.close()
+    except:
+        pass
 
 def scan_ports(target, ports):
-    print(f"[*] Scanning {target}...")
+    print(Fore.CYAN + f"[*] Scanning {target}...\n")
+    threads = []
     for port in ports:
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            socket.setdefaulttimeout(0.5)
-            result = sock.connect_ex((target, port))
-            if result == 0:
-                print(f"[+] Port {port} is OPEN")
-            sock.close()
-        except KeyboardInterrupt:
-            print("\n[!] Scan aborted by user")
-            sys.exit()
-        except socket.gaierror:
-            print("[!] Hostname could not be resolved")
-            sys.exit()
-        except socket.error:
-            print("[!] Could not connect to server")
-            sys.exit()
+        t = threading.Thread(target=scan_port, args=(target, port))
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
 
 if __name__ == "__main__":
-    target = input("Enter target host (IP or domain): ").strip()
-    # Example: 21,22,80,443
-    port_input = input("Enter ports separated by commas: ").strip()
+    banner()
+    print(Fore.YELLOW + "=== Port Scanner ===")
+    target = input(Fore.CYAN + "Enter target host (IP or domain): ").strip()
+    port_input = input(Fore.CYAN + "Enter ports separated by commas (e.g. 21,22,80): ").strip()
+
     try:
         ports = [int(p) for p in port_input.split(",")]
     except ValueError:
-        print("[!] Invalid port numbers")
+        print(Fore.RED + "[!] Invalid port numbers")
         sys.exit()
 
     scan_ports(target, ports)
+    print(Fore.MAGENTA + "\n[!] Scan finished!")
