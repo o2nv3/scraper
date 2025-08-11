@@ -1,0 +1,34 @@
+import socket
+import sys
+
+def scan_ports(target, ports):
+    print(f"[*] Scanning {target}...")
+    for port in ports:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            socket.setdefaulttimeout(0.5)
+            result = sock.connect_ex((target, port))
+            if result == 0:
+                print(f"[+] Port {port} is OPEN")
+            sock.close()
+        except KeyboardInterrupt:
+            print("\n[!] Scan aborted by user")
+            sys.exit()
+        except socket.gaierror:
+            print("[!] Hostname could not be resolved")
+            sys.exit()
+        except socket.error:
+            print("[!] Could not connect to server")
+            sys.exit()
+
+if __name__ == "__main__":
+    target = input("Enter target host (IP or domain): ").strip()
+    # Example: 21,22,80,443
+    port_input = input("Enter ports separated by commas: ").strip()
+    try:
+        ports = [int(p) for p in port_input.split(",")]
+    except ValueError:
+        print("[!] Invalid port numbers")
+        sys.exit()
+
+    scan_ports(target, ports)
