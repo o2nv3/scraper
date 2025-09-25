@@ -1,20 +1,21 @@
+# basic port scanner 
+
 import socket
 import sys
 import threading
 from colorama import Fore, Style, init
 import pyfiglet
 
-# Init colorama
 init(autoreset=True)
 
-# Banner
+
 def banner():
     ascii_banner = pyfiglet.figlet_format("AMIN")
     colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.CYAN, Fore.MAGENTA]
     for i, line in enumerate(ascii_banner.split("\n")):
         print(colors[i % len(colors)] + line)
 
-# Threaded scanner
+
 def scan_port(target, port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,9 +39,9 @@ def scan_ports(target, ports):
 
 if __name__ == "__main__":
     banner()
-    print(Fore.YELLOW + "=== Port Scanner ===")
+    print(Fore.YELLOW + "=== PortScanner by 23 ===")
     target = input(Fore.CYAN + "Enter target host (IP or domain): ").strip()
-    port_input = input(Fore.CYAN + "Enter ports separated by commas (e.g. 21,22,80): ").strip()
+    port_input = input(Fore.CYAN + "Enter the ports needed (e.g. 21,22,80): ").strip()
 
     try:
         ports = [int(p) for p in port_input.split(",")]
@@ -49,4 +50,4 @@ if __name__ == "__main__":
         sys.exit()
 
     scan_ports(target, ports)
-    print(Fore.MAGENTA + "\n[!] Scan finished!")
+    print(Fore.MAGENTA + "\n[!] The scan completed succesfully !")
